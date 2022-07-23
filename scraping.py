@@ -1,13 +1,13 @@
 from ast import Break
 import sys
-from xmlrpc.client import ResponseError
 from bs4 import BeautifulSoup
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import json
 import requests
 import os
 import re
-import codecs
 
 
 def saveFile(dictionnaryy, filename):
@@ -55,12 +55,7 @@ def scrape(url):
     print(url)
     html = ""
     try:
-        html = requests.get(url, verify=False)
-
-        # TESTING
-        # f=codecs.open("test.html", 'r')
-        # html = f.read()
-        # soup = BeautifulSoup(html, "html.parser")
+        html = requests.get(url, verify=False,allow_redirects=False)
 
         soup = BeautifulSoup(html.content, "html.parser")
         tags = soup("a")
@@ -71,11 +66,8 @@ def scrape(url):
             print(tag)
             try:
                 key = tag.split("/")[2]
-                # key = keys[1]
             except:
-                # print("reference not a url")
                 continue
-            # print(key + " | " + tag)
 
             while key in socials.keys():
                 key += "_"
@@ -194,13 +186,14 @@ def checkInput(url):
         return "domain"
 
 
-if len(sys.argv) > 1:
-    url = sys.argv[1]
+def getInput():
+    if len(sys.argv) > 1:
+        return sys.argv[1]
+    else:
+        return input("Enter url: ").strip()
 
-else:
-    url = input("Enter url: ").strip()
 
-
+url = getInput()
 inputType = checkInput(url)
 
 print("$ input type: " + inputType)
