@@ -54,3 +54,9 @@
   - Whitelisted Links:
     
     ![image](https://user-images.githubusercontent.com/81851926/179397458-554923df-c156-4b79-9beb-9a774faa47b4.png)
+
+## Other Features:
+
+#### not allowing redirects.
+#### bypassing certificates
+
