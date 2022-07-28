@@ -8,6 +8,11 @@ import json
 import requests
 import os
 import re
+import xml.etree.ElementTree as ET
+
+requests.packages.urllib3.disable_warnings()
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
 
 def saveFile(dictionnaryy, filename):
@@ -17,35 +22,43 @@ def saveFile(dictionnaryy, filename):
     with open(filename, "w") as outfile:
         outfile.write(json_object)
 
-    print("Retrieved data saved at: " + os.getcwd() + "/" + filename)
+    print("\nRetrieved data saved at: " + os.getcwd() + "/" + filename)
+
+
+def xmlToList(fileName):
+    try:
+        xmlfile = ET.parse(fileName)
+        xmlroot = xmlfile.getroot()
+        aList = list()
+        for child in xmlroot.iter():
+            aList.append(child.text)
+        return aList
+    except:
+        print("! "+fileName+" was not found, create a file and try again.")
 
 
 def cleanDict(socials):
+
+    whiteList = xmlToList("socialMedia.xml")
+    notAProfile = xmlToList("urlNonProfileTerms.xml")
+
     newDict = dict()
-
-    whiteList = [
-        "facebook",
-        "youtube",
-        "instagram",
-        "twitter",
-        "tiktok",
-        "youtube",
-        "medium",
-        "github",
-        "linkedin",
-        "reddit",
-        "pinterest",
-        "replit",
-        "twitch",
-        "drive",
-    ]
-
     for social in socials.keys():
         for key in whiteList:
+
             if key in social:
                 while key in newDict.keys():
                     key += "_"
-                newDict[key] = socials[social]
+
+                try:
+                    if socials[social].split("/")[3] in notAProfile:
+                        pass
+                    else:
+                        newDict[key] = socials[social]
+                        print(socials[social])
+                except:
+                    pass
+
     return newDict
 
 
@@ -55,15 +68,16 @@ def scrape(url):
     print(url)
     html = ""
     try:
-        html = requests.get(url, verify=False,allow_redirects=False)
-
+        html = requests.get(url, verify=False,
+                            allow_redirects=False, headers=headers)
+        # print(html.content)
         soup = BeautifulSoup(html.content, "html.parser")
         tags = soup("a")
         socials = dict()
 
         for tag in tags:
             tag = tag.get("href", None)
-            print(tag)
+            # print(tag)
             try:
                 key = tag.split("/")[2]
             except:
@@ -80,6 +94,7 @@ def scrape(url):
             exit()
 
         saveFile(socials, "AllFoundUrls.json")
+        # print(socials)
         cleanedDict = cleanDict(socials)
 
         if not cleanedDict:
