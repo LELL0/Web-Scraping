@@ -41,11 +41,17 @@
 
 ### The script has a whiteList that filters the links that we are interested in (you can add or remove elements to it).
   
-  ![image](https://user-images.githubusercontent.com/81851926/179397367-66af6c25-e350-4fe3-a80e-fcf191feedc1.png)
+  ![image](https://user-images.githubusercontent.com/81851926/181505696-1d633b61-30bb-4aef-8f3d-22c78acc14ab.png)
+
+  
+### The script has a blacklist that filters the links that contains any of the keywords in there subdirectory filtering any non profile url
+  (you can add or remove elements to it).
+  
+  ![image](https://user-images.githubusercontent.com/81851926/181505338-2ea8392b-45a3-49af-b304-f0e81c6c2482.png)
 
 ### The script Saves two files, one file with all the found links and another with the whitelisted items.
 
-![image](https://user-images.githubusercontent.com/81851926/179397409-ffed665e-5e84-418e-89d4-f6f92c1324a6.png)
+  ![image](https://user-images.githubusercontent.com/81851926/179397409-ffed665e-5e84-418e-89d4-f6f92c1324a6.png)
 
   - All Links:
     
@@ -59,4 +65,3 @@
 
 #### not allowing redirects.
 #### bypassing certificates
-
