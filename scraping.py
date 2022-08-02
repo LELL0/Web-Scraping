@@ -1,4 +1,3 @@
-from ast import Break
 import sys
 from bs4 import BeautifulSoup
 import urllib.request
@@ -8,11 +7,43 @@ import json
 import requests
 import os
 import re
+import datetime
 import xml.etree.ElementTree as ET
 
 requests.packages.urllib3.disable_warnings()
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+
+
+def writeToLogs(logText):
+    try:
+        f = open("log.txt", "a")
+        f.write("["+str(datetime.datetime.now())+"] " + str(logText)+'\n')
+        f.close()
+    except:
+        f.close()
+
+
+def getContentSelenium(url):
+    try:
+        from bs4 import BeautifulSoup
+        from selenium import webdriver
+    except:
+        writeToLogs("selenium is not installed do 'pip install selenium'")
+        return 0
+    try:
+        driver = webdriver.Chrome(executable_path='./chromedriver')
+        driver.get(url)
+    except:
+        writeToLogs(
+            "'chromedriver' executable needs to be in PATH. Please see https://chromedriver.chromium.org/home")
+        return 0
+
+    soup = BeautifulSoup(driver.page_source, features='html.parser')
+    driver.quit()
+
+    return soup
 
 
 def saveFile(dictionnaryy, filename):
@@ -22,7 +53,8 @@ def saveFile(dictionnaryy, filename):
     with open(filename, "w") as outfile:
         outfile.write(json_object)
 
-    print("\nRetrieved data saved at: " + os.getcwd() + "/" + filename)
+    writeToLogs("Retrieved data saved at: " +
+                str(os.getcwd()) + "/" + filename)
 
 
 def xmlToList(fileName):
@@ -34,7 +66,8 @@ def xmlToList(fileName):
             aList.append(child.text)
         return aList
     except:
-        print("! "+fileName+" was not found, create a file and try again.")
+        writeToLogs("! "+fileName +
+                    " was not found, create a file and try again.")
 
 
 def cleanDict(socials):
@@ -55,102 +88,130 @@ def cleanDict(socials):
                         pass
                     else:
                         newDict[key] = socials[social]
-                        print(socials[social])
+                        writeToLogs(socials[social])
                 except:
                     pass
 
     return newDict
 
 
-def scrape(url):
+def getContentSelenium(url):
+    writeToLogs("\nSCRAPING WITH Selenium ")
+    writeToLogs(url)
+    try:
+        from bs4 import BeautifulSoup
+        from selenium import webdriver
+    except:
+        writeToLogs("selenium is not installed do 'pip install selenium'")
+        return 0
+    try:
+        driver = webdriver.Chrome(executable_path='./chromedriver')
+        driver.get(url)
+    except:
+        writeToLogs(
+            "'chromedriver' executable needs to be in PATH. Please see https://chromedriver.chromium.org/home")
+        return 0
 
-    print("\nSCRAPING ", end="")
-    print(url)
-    html = ""
+    soup = BeautifulSoup(driver.page_source, features='html.parser')
+    driver.quit()
+
+    return soup
+
+
+def getcontent(url):
+    writeToLogs("\nSCRAPING ")
+    writeToLogs(url)
     try:
         html = requests.get(url, verify=False,
                             allow_redirects=False, headers=headers)
-        # print(html.content)
         soup = BeautifulSoup(html.content, "html.parser")
-        tags = soup("a")
-        socials = dict()
-
-        for tag in tags:
-            tag = tag.get("href", None)
-            # print(tag)
-            try:
-                key = tag.split("/")[2]
-            except:
-                continue
-
-            while key in socials.keys():
-                key += "_"
-
-            socials[key.lower()] = tag.lower()
-
-        # print(socials)
-        if not socials:
-            print("\n! No links were Found\n")
-            exit()
-
-        saveFile(socials, "AllFoundUrls.json")
-        # print(socials)
-        cleanedDict = cleanDict(socials)
-
-        if not cleanedDict:
-            print(
-                "\n! Your desired links were not found but we found other links in: "
-                + os.getcwd()
-                + "\n"
-            )
-            exit()
-
-        saveFile(cleanedDict, "CleanOutput.json")
 
     except urllib.error.HTTPError as e:
-        print(
+        writeToLogs(
             url
             + ": '"
-            + e.__dict__["msg"]
+            + str(e.__dict__["msg"])
             + "' "
             + " Website might be protected by CAPTCHA"
+
         )
+        return 0
     except urllib.error.URLError as e:
-        print(
+        writeToLogs(
             url
             + ": '"
-            + e.__dict__["msg"]
+            + str(e.__dict__["msg"])
             + "' "
             + " Website might be protected by CAPTCHA"
         )
+        return 0
+    except:
+        return 0
+
+    return soup
+
+
+def scrape(soup):
+
+    tags = soup("a")
+    socials = dict()
+
+    for tag in tags:
+        tag = tag.get("href", None)
+        try:
+            key = tag.split("/")[2]
+        except:
+            continue
+
+        while key in socials.keys():
+            key += "_"
+
+        socials[key.lower()] = tag.lower()
+
+    if not socials:
+        writeToLogs("! No links were Found")
+        return 0
+
+    saveFile(socials, "AllFoundUrls.json")
+    cleanedDict = cleanDict(socials)
+
+    if not cleanedDict:
+        writeToLogs(
+            "\n! Your desired links were not found but we found other links in: "
+            + str(os.getcwd())
+            + "\n"
+        )
+        exit()
+
+    saveFile(cleanedDict, "CleanOutput.json")
 
 
 def check(url):
     try:
         r = requests.head(url)
-        urllib.request.urlopen(url)
+        # urllib.request.urlopen(url)
         return r.status_code
 
     except urllib.error.HTTPError as e:
-        print(
+        writeToLogs(
             url
             + ": '"
-            + e.__dict__["msg"]
+            + str(e.__dict__["msg"])
             + "' "
             + " Website might be protected by CAPTCHA"
         )
         return e.__dict__["code"]
     except urllib.error.URLError as e:
-        print(
+        writeToLogs(
             url
             + ": '"
-            + e.__dict__["msg"]
+            + str(e.__dict__["msg"])
             + "' "
             + " Website might be protected by CAPTCHA"
         )
         return e.__dict__["code"]
     except:
-        print(url + ": Request ERROR")
+        writeToLogs(url + ": Request ERROR")
         return 1000
 
 
@@ -166,10 +227,10 @@ def cleanurl(url):
     elif "https://" in url:
         url = url.replace("https://", "")
 
-    print("\n" + "#" * 100)
-    print("Target to scrape: ", end="")
-    print(url)
-    print("#" * 100 + "\n")
+    writeToLogs("\n" + "#" * 100)
+    writeToLogs("Target to scrape: ")
+    writeToLogs(url)
+    writeToLogs("#" * 100 + "\n")
     return url
 
 
@@ -211,45 +272,55 @@ def getInput():
 url = getInput()
 inputType = checkInput(url)
 
-print("$ input type: " + inputType)
+writeToLogs("$ input type: " + inputType)
 
 if inputType == "ip":
     if check(url) < 400:
-        scrape(url)
+        if scrape(getcontent(url)) == 0:
+            scrape(getContentSelenium(url))
 
     elif check("http://" + url) < 400:
-        scrape("http://" + url)
-
+        if scrape(getcontent("http://" + url)) == 0:
+            scrape(getContentSelenium("http://" + url))
     elif check("http://" + url) < 400:
-        scrape("https://" + url)
+        if scrape(getcontent("https://" + url)) == 0:
+            scrape(getContentSelenium("https://" + url))
 
 elif inputType == "url":
     check(url)
-    scrape(url)
+    if scrape(getcontent(url)) == 0:
+        scrape(getContentSelenium(url))
 
 elif inputType == "domain":
     new_url = cleanurl(url)
 
     if check(new_url) < 400:
-        scrape(new_url)
+        if scrape(getcontent(new_url)) == 0:
+            scrape(getContentSelenium(new_url))
 
     elif check("www." + new_url) < 400:
-        scrape("www." + new_url)
+        if scrape(getcontent("www." + new_url)) == 0:
+            scrape(getContentSelenium("www." + new_url))
 
     elif check("http://www." + new_url) < 400:
-        scrape("http://www." + new_url)
-
+        if scrape(getcontent("http://www." + new_url)) == 0:
+            scrape(getContentSelenium("http://www." + new_url))
+            
     elif check("https://www." + new_url) < 400:
-        scrape("https://www." + new_url)
+        if scrape(getcontent("https://www." + new_url)) == 0:
+            scrape(getContentSelenium("https://www." + new_url))
 
     elif check("http://" + new_url) < 400:
-        scrape("http://" + new_url)
+        if scrape(getcontent("http://" + new_url)) == 0:
+            scrape(getContentSelenium("http://" + new_url))
 
     elif check("https://" + new_url) < 400:
-        scrape("https://" + new_url)
-
+        if scrape(getcontent("https://" + new_url)) == 0:
+            scrape(getContentSelenium("https://" + new_url))
     else:
-        print("\n! WEBSITE NOT ACCESSIBLE, COULDN'T BE SCRAPED\n")
+        writeToLogs("\n! WEBSITE NOT ACCESSIBLE, COULDN'T BE SCRAPED\n")
 
 else:
-    print("\n! WEBSITE NOT ACCESSIBLE, COULDN'T BE SCRAPED\n")
+    writeToLogs("\n! WEBSITE NOT ACCESSIBLE, COULDN'T BE SCRAPED\n")
+    
+writeToLogs("DONE")
