@@ -35,19 +35,22 @@
   
   ![image](https://user-images.githubusercontent.com/81851926/179397242-5b11cfa0-4c68-4977-8f02-a7189d3e2bd8.png)
 
+
 ### The script checks for captcha.
   
   ![image](https://user-images.githubusercontent.com/81851926/179397219-c3b14460-4895-438f-87a4-80224acabdf8.png)
+
 
 ### The script has a whiteList that filters the links that we are interested in (you can add or remove elements to it).
   
   ![image](https://user-images.githubusercontent.com/81851926/181505696-1d633b61-30bb-4aef-8f3d-22c78acc14ab.png)
 
-  
+
 ### The script has a blacklist that filters the links that contains any of the keywords in there subdirectory filtering any non profile url
   (you can add or remove elements to it).
   
   ![image](https://user-images.githubusercontent.com/81851926/181505338-2ea8392b-45a3-49af-b304-f0e81c6c2482.png)
+
 
 ### The script Saves two files, one file with all the found links and another with the whitelisted items.
 
@@ -55,13 +58,24 @@
 
   - All Links:
     
-    ![image](https://user-images.githubusercontent.com/81851926/179397440-a31f90d8-d875-490e-9ba0-f95a61e9f81b.png)
+    ![image](https://user-images.githubusercontent.com/81851926/182587327-9a64d468-8aad-4fb6-b1fb-ff59bdf83d25.png)
+
 
   - Whitelisted Links:
     
-    ![image](https://user-images.githubusercontent.com/81851926/179397458-554923df-c156-4b79-9beb-9a774faa47b4.png)
+    ![image](https://user-images.githubusercontent.com/81851926/182587387-95c02b78-6ee0-4587-9af7-601c66006d67.png)
+
+
+### Log file:
+
+![image](https://user-images.githubusercontent.com/81851926/182587786-4b000552-69a3-454e-8eb7-067b4e79492f.png)
+
 
 ## Other Features:
 
 #### not allowing redirects.
-#### bypassing certificates
+#### bypassing certificates.
+#### Filtering duplicate links.
+#### filter non profile links (feed, stories, stores, etc.).
+#### Bypassing INCAPSULA.
+#### Log file when running the script.

@@ -46,9 +46,9 @@ def getContentSelenium(url):
     return soup
 
 
-def saveFile(dictionnaryy, filename):
+def saveFile(dict_, filename):
 
-    json_object = json.dumps(dictionnaryy, indent=4)
+    json_object = json.dumps(dict_, indent=4)
 
     with open(filename, "w") as outfile:
         outfile.write(json_object)
@@ -68,6 +68,18 @@ def xmlToList(fileName):
     except:
         writeToLogs("! "+fileName +
                     " was not found, create a file and try again.")
+
+def removeDups(dict_):
+    try:
+        temp = []
+        result = dict()
+        for key, val in dict_.items():
+            if val not in temp:
+                temp.append(val)
+                result[key] = val
+    except:
+        writeToLogs("Something went wrong when removing duplicates")   
+    return result
 
 
 def cleanDict(socials):
@@ -173,7 +185,8 @@ def scrape(soup):
         return 0
 
     saveFile(socials, "AllFoundUrls.json")
-    cleanedDict = cleanDict(socials)
+    socialsNoDups=removeDups(socials)
+    cleanedDict = cleanDict(socialsNoDups)
 
     if not cleanedDict:
         writeToLogs(
@@ -227,7 +240,7 @@ def cleanurl(url):
     elif "https://" in url:
         url = url.replace("https://", "")
 
-    writeToLogs("\n" + "#" * 100)
+    writeToLogs("#" * 100)
     writeToLogs("Target to scrape: ")
     writeToLogs(url)
     writeToLogs("#" * 100 + "\n")
