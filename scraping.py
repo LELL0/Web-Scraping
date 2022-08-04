@@ -9,7 +9,6 @@ import os
 import re
 import datetime
 import xml.etree.ElementTree as ET
-
 requests.packages.urllib3.disable_warnings()
 
 headers = {
@@ -113,11 +112,14 @@ def getContentSelenium(url):
     try:
         from bs4 import BeautifulSoup
         from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
     except:
         writeToLogs("selenium is not installed do 'pip install selenium'")
         return 0
     try:
-        driver = webdriver.Chrome(executable_path='./chromedriver')
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        driver = webdriver.Chrome(executable_path='./chromedriver',options=chrome_options)
         driver.get(url)
     except:
         writeToLogs(
