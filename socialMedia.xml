@@ -2,6 +2,7 @@
 <collection>
     <socialmedia>facebook</socialmedia>
     <socialmedia>youtube</socialmedia>
+    <socialmedia>youtu.be</socialmedia>
     <socialmedia>instagram</socialmedia>
     <socialmedia>twitter</socialmedia>
     <socialmedia>tiktok</socialmedia>
@@ -13,4 +14,5 @@
     <socialmedia>replit</socialmedia>
     <socialmedia>twitch</socialmedia>
     <socialmedia>drive</socialmedia>
+    <socialmedia>maps</socialmedia>
 </collection>
